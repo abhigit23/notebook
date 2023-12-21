@@ -1,17 +1,9 @@
-import {
-	Box,
-	Divider,
-	IconButton,
-	Show,
-	Textarea,
-	VStack,
-} from "@chakra-ui/react";
-import EmojiPicker, { Theme } from "emoji-picker-react";
+import { Divider, IconButton, Show, Textarea, VStack } from "@chakra-ui/react";
 import { useRef } from "react";
 import useDescription from "../hooks/useDescription";
 import useEmoji from "../hooks/useEmoji";
 import useText, { TextAreaEvent } from "../hooks/useText";
-import useThemeKey from "../hooks/useThemeKey";
+import EmojiPickerEl from "./EmojiPickerEl";
 
 interface Props {
 	title: string;
@@ -20,12 +12,15 @@ interface Props {
 }
 
 function Editor({ title, onTitleChange, readOnly }: Props) {
-	const themeKey = useThemeKey();
 	const textRef = useRef<HTMLTextAreaElement>(null);
 	const { rows, handleText, text } = useText(textRef);
 	const { description, handleDescription } = useDescription();
-	const { selectedEmoji, showEmojiPicker, handleEmojiButton, handleOpenEmoji } =
-		useEmoji();
+	const {
+		selectedEmoji2,
+		showEmojiPicker,
+		handleEmojiButton,
+		handleOpenEmoji2,
+	} = useEmoji();
 
 	return (
 		<>
@@ -35,27 +30,13 @@ function Editor({ title, onTitleChange, readOnly }: Props) {
 					size="lg"
 					variant="unstyled"
 					fontSize="45px"
-					icon={<span>{selectedEmoji.emoji}</span>}
+					icon={<span>{selectedEmoji2.emoji}</span>}
 					onClick={handleEmojiButton}
 					pos="absolute"
 				/>
 			</Show>
 			{showEmojiPicker && (
-				<Box
-					style={{
-						position: "absolute",
-						top: "10rem",
-						zIndex: "2",
-						width: "200px",
-					}}
-				>
-					<EmojiPicker
-						theme={Theme[themeKey]}
-						onEmojiClick={handleOpenEmoji}
-						lazyLoadEmojis={true}
-						autoFocusSearch={false}
-					/>
-				</Box>
+				<EmojiPickerEl onEmojiClick={handleOpenEmoji2} top="10rem" />
 			)}
 			<VStack marginX={{ base: 0, lg: "65px" }}>
 				<Textarea

@@ -5,16 +5,7 @@ import Sidebar from "./components/Sidebar";
 import useHandler from "./hooks/useHandler";
 
 function App() {
-	const {
-		selectedEmoji,
-		showEmojiPicker,
-		title,
-		readOnly,
-		handleButtonClick,
-		handleEmojiClick,
-		onTitleChange,
-		handleEditButton,
-	} = useHandler();
+	const { title, readOnly, onTitleChange, handleEditButton } = useHandler();
 
 	return (
 		<Grid
@@ -22,14 +13,7 @@ function App() {
 			templateColumns={{ base: "1fr", lg: "250px 1fr" }}
 		>
 			<GridItem area="nav">
-				<Navbar
-					selectedEmoji={selectedEmoji.emoji}
-					showEmojiPicker={showEmojiPicker}
-					handleEmojiClick={(emojiObj) => handleEmojiClick(emojiObj)}
-					handleButtonClick={handleButtonClick}
-					readOnly={readOnly}
-					handleEditButton={handleEditButton}
-				/>
+				<Navbar readOnly={readOnly} handleEditButton={handleEditButton} />
 			</GridItem>
 			<Show above="lg" ssr={false}>
 				<GridItem area="aside" padding={3}>

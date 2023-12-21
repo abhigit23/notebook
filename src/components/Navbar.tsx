@@ -1,5 +1,4 @@
 import {
-	Box,
 	Button,
 	Editable,
 	EditableInput,
@@ -13,7 +12,6 @@ import {
 	MenuList,
 	Show,
 } from "@chakra-ui/react";
-import EmojiPicker, { Theme } from "emoji-picker-react";
 import { useRef } from "react";
 import {
 	FaCodeMerge,
@@ -21,31 +19,25 @@ import {
 	FaPenToSquare,
 } from "react-icons/fa6";
 import { ImSphere } from "react-icons/im";
-import { Emoji } from "../hooks/useHandler";
+import useEmoji from "../hooks/useEmoji";
 import useHeading from "../hooks/useHeading";
-import useThemeKey from "../hooks/useThemeKey";
 import ColorModeSwitch from "./ColorModeSwitch";
+import EmojiPickerEl from "./EmojiPickerEl";
 
 interface Props {
-	selectedEmoji: string;
-	showEmojiPicker: boolean;
 	readOnly: boolean;
-	handleEmojiClick: (emojiObj: Emoji) => void;
-	handleButtonClick: () => void;
 	handleEditButton: () => void;
 }
 
-function Navbar({
-	selectedEmoji,
-	showEmojiPicker,
-	readOnly,
-	handleEmojiClick,
-	handleButtonClick,
-	handleEditButton,
-}: Props) {
-	const themeKey = useThemeKey();
+function Navbar({ readOnly, handleEditButton }: Props) {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const { heading, handleHeadingInput } = useHeading(inputRef);
+	const {
+		selectedEmoji1,
+		showEmojiPicker,
+		handleEmojiButton,
+		handleOpenEmoji1,
+	} = useEmoji();
 
 	return (
 		<Flex padding={3} marginY={2}>
@@ -53,19 +45,12 @@ function Navbar({
 				<Show above="lg" ssr={false}>
 					<IconButton
 						aria-label="emoji"
-						icon={<span>{selectedEmoji}</span>}
-						onClick={() => handleButtonClick()}
+						icon={<span>{selectedEmoji1.emoji}</span>}
+						onClick={handleEmojiButton}
 					/>
 
 					{showEmojiPicker && (
-						<Box style={{ position: "absolute", top: "5rem", zIndex: "2" }}>
-							<EmojiPicker
-								theme={Theme[themeKey]}
-								onEmojiClick={(emojiObj) => handleEmojiClick(emojiObj)}
-								lazyLoadEmojis={true}
-								autoFocusSearch={false}
-							/>
-						</Box>
+						<EmojiPickerEl onEmojiClick={handleOpenEmoji1} top="5rem" />
 					)}
 				</Show>
 
