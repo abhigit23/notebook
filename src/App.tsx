@@ -13,7 +13,11 @@ function App() {
 			templateColumns={{ base: "1fr", lg: "250px 1fr" }}
 		>
 			<GridItem area="nav">
-				<Navbar readOnly={readOnly} handleEditButton={handleEditButton} />
+				<Navbar
+					readOnly={readOnly}
+					handleEditButton={handleEditButton}
+					title={title}
+				/>
 			</GridItem>
 			<Show above="lg" ssr={false}>
 				<GridItem area="aside" padding={3}>

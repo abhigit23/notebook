@@ -1,5 +1,12 @@
 import {
 	Button,
+	Drawer,
+	DrawerBody,
+	DrawerCloseButton,
+	DrawerContent,
+	DrawerFooter,
+	DrawerHeader,
+	DrawerOverlay,
 	Editable,
 	EditableInput,
 	EditablePreview,
@@ -11,9 +18,11 @@ import {
 	MenuItem,
 	MenuList,
 	Show,
+	useDisclosure,
 } from "@chakra-ui/react";
 import { useRef } from "react";
 import {
+	FaBars,
 	FaCodeMerge,
 	FaEllipsisVertical,
 	FaPenToSquare,
@@ -23,13 +32,15 @@ import useEmoji from "../hooks/useEmoji";
 import useHeading from "../hooks/useHeading";
 import ColorModeSwitch from "./ColorModeSwitch";
 import EmojiPickerEl from "./EmojiPickerEl";
+import Item from "./Item";
 
 interface Props {
 	readOnly: boolean;
 	handleEditButton: () => void;
+	title: string;
 }
 
-function Navbar({ readOnly, handleEditButton }: Props) {
+function Navbar({ readOnly, handleEditButton, title }: Props) {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const { heading, handleHeadingInput } = useHeading(inputRef);
 	const {
@@ -39,19 +50,56 @@ function Navbar({ readOnly, handleEditButton }: Props) {
 		handleOpenEmoji1,
 	} = useEmoji();
 
+	const { isOpen, onOpen, onClose } = useDisclosure();
+	const btnRef = useRef<HTMLButtonElement>(null);
+
 	return (
 		<Flex padding={3} marginY={2}>
-			<HStack flex={1}>
+			<HStack flex={1} align="flex-start">
 				<Show above="lg" ssr={false}>
 					<IconButton
 						aria-label="emoji"
 						icon={<span>{selectedEmoji1.emoji}</span>}
 						onClick={handleEmojiButton}
+						// my={1}
 					/>
 
 					{showEmojiPicker && (
 						<EmojiPickerEl onEmojiClick={handleOpenEmoji1} top="5rem" />
 					)}
+				</Show>
+
+				<Show below="lg" ssr={false}>
+					<IconButton
+						aria-label="share"
+						ref={btnRef}
+						onClick={onOpen}
+						icon={<FaBars />}
+						// my={2}
+					/>
+					<Drawer
+						isOpen={isOpen}
+						placement="left"
+						onClose={onClose}
+						finalFocusRef={btnRef}
+					>
+						<DrawerOverlay />
+						<DrawerContent>
+							<DrawerCloseButton />
+							<DrawerHeader>Create your Notes 😀</DrawerHeader>
+
+							<DrawerBody>
+								<Item title={title} id="1" child={[]} parent={null} />
+							</DrawerBody>
+
+							<DrawerFooter>
+								<Button variant="outline" mr={3} onClick={onClose}>
+									Cancel
+								</Button>
+								<Button colorScheme="blue">Add New Page</Button>
+							</DrawerFooter>
+						</DrawerContent>
+					</Drawer>
 				</Show>
 
 				<Editable
@@ -68,7 +116,7 @@ function Navbar({ readOnly, handleEditButton }: Props) {
 					/>
 				</Editable>
 			</HStack>
-			<HStack h="fit-content" py={2}>
+			<HStack h="fit-content">
 				<Show above="lg" ssr={false}>
 					<Button leftIcon={<ImSphere />}>Share</Button>
 					<Button
@@ -79,7 +127,7 @@ function Navbar({ readOnly, handleEditButton }: Props) {
 						{readOnly ? "Edit" : "Merge"}
 					</Button>
 				</Show>
-				<Show below="lg" ssr={false}>
+				{/* <Show below="lg" ssr={false}>
 					<IconButton aria-label="share" icon={<ImSphere />} />
 					<IconButton
 						aria-label="edit"
@@ -87,7 +135,7 @@ function Navbar({ readOnly, handleEditButton }: Props) {
 						colorScheme="blue"
 						onClick={handleEditButton}
 					/>
-				</Show>
+				</Show> */}
 				<Menu>
 					<MenuButton
 						as={IconButton}
