@@ -61,7 +61,6 @@ function Navbar({ readOnly, handleEditButton, title }: Props) {
 						aria-label="emoji"
 						icon={<span>{selectedEmoji1.emoji}</span>}
 						onClick={handleEmojiButton}
-						// my={1}
 					/>
 
 					{showEmojiPicker && (
@@ -75,7 +74,6 @@ function Navbar({ readOnly, handleEditButton, title }: Props) {
 						ref={btnRef}
 						onClick={onOpen}
 						icon={<FaBars />}
-						// my={2}
 					/>
 					<Drawer
 						isOpen={isOpen}
@@ -102,17 +100,13 @@ function Navbar({ readOnly, handleEditButton, title }: Props) {
 					</Drawer>
 				</Show>
 
-				<Editable
-					defaultValue={heading}
-					placeholder="Heading"
-					fontSize="2xl"
-					paddingX={2}
-				>
-					<EditablePreview />
+				<Editable defaultValue={heading} placeholder="Heading" fontSize="2xl">
+					<EditablePreview p={0} />
 					<EditableInput
 						ref={inputRef}
 						onChange={handleHeadingInput}
 						_focusVisible={{ outline: "none" }}
+						p={0}
 					/>
 				</Editable>
 			</HStack>
