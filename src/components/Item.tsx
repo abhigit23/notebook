@@ -50,7 +50,7 @@ function Item({ id, title, child }: Props) {
 				paddingRight={1}
 			>
 				<Text w="80%" paddingY={2}>
-					{title}
+					{title ? title : "Untitled Page"}
 				</Text>
 				<Menu size="sm">
 					<MenuButton

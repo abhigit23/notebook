@@ -49,6 +49,7 @@ function Editor({ title, onTitleChange, readOnly }: Props) {
 					resize="none"
 					onChange={(e) => onTitleChange(e)}
 					isReadOnly={readOnly}
+					rows={3}
 				/>
 				<Textarea
 					value={description}

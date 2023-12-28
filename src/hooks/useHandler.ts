@@ -9,9 +9,9 @@ export interface Emoji {
 const useHandler = () => {
 	const toast = useToast();
 	const [title, setTitle] = useState(
-		localStorage.getItem("title") || "Untitled",
+		localStorage.getItem("title") || "Untitled Page",
 	);
-	const [readOnly, setReadOnly] = useState(true);
+	const [readOnly, setReadOnly] = useState(false);
 
 	const onTitleChange = (e: TextAreaEvent) => {
 		setTitle(e.target.value);
@@ -22,7 +22,7 @@ const useHandler = () => {
 		setReadOnly((prev) => !prev);
 		if (!readOnly) {
 			toast({
-				title: "Merged Successfully",
+				title: "Saved Successfully",
 				position: "bottom",
 				status: "success",
 				isClosable: true,

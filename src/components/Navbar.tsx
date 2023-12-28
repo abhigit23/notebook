@@ -23,7 +23,7 @@ import {
 import { useRef } from "react";
 import {
 	FaBars,
-	FaCodeMerge,
+	FaFloppyDisk,
 	FaEllipsisVertical,
 	FaPenToSquare,
 } from "react-icons/fa6";
@@ -115,21 +115,12 @@ function Navbar({ readOnly, handleEditButton, title }: Props) {
 					<Button leftIcon={<ImSphere />}>Share</Button>
 					<Button
 						onClick={handleEditButton}
-						leftIcon={readOnly ? <FaPenToSquare /> : <FaCodeMerge />}
+						leftIcon={readOnly ? <FaPenToSquare /> : <FaFloppyDisk />}
 						colorScheme="blue"
 					>
-						{readOnly ? "Edit" : "Merge"}
+						{readOnly ? "Edit" : "Save"}
 					</Button>
 				</Show>
-				{/* <Show below="lg" ssr={false}>
-					<IconButton aria-label="share" icon={<ImSphere />} />
-					<IconButton
-						aria-label="edit"
-						icon={readOnly ? <FaPenToSquare /> : <FaCodeMerge />}
-						colorScheme="blue"
-						onClick={handleEditButton}
-					/>
-				</Show> */}
 				<Menu>
 					<MenuButton
 						as={IconButton}
