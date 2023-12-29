@@ -1,20 +1,18 @@
 import { Divider, IconButton, Show, Textarea, VStack } from "@chakra-ui/react";
-import { useRef } from "react";
-import useDescription from "../hooks/useDescription";
+import React from "react";
+import { Page } from "../App";
 import useEmoji from "../hooks/useEmoji";
-import useText, { TextAreaEvent } from "../hooks/useText";
+import { TextAreaEvent } from "../hooks/useText";
 import EmojiPickerEl from "./EmojiPickerEl";
 
 interface Props {
-	title: string;
-	readOnly: boolean;
-	onTitleChange: (e: TextAreaEvent) => void;
+	pageTitle: (pageId: string, title: string) => void;
+	pageDescription: (pageId: string, description: string) => void;
+	pageContent: (pageId: string, contentS: string) => void;
+	pages: Page[];
 }
 
-function Editor({ title, onTitleChange, readOnly }: Props) {
-	const textRef = useRef<HTMLTextAreaElement>(null);
-	const { rows, handleText, text } = useText(textRef);
-	const { description, handleDescription } = useDescription();
+function Editor({ pageTitle, pageDescription, pageContent, pages }: Props) {
 	const {
 		selectedEmoji2,
 		showEmojiPicker,
@@ -22,59 +20,82 @@ function Editor({ title, onTitleChange, readOnly }: Props) {
 		handleOpenEmoji2,
 	} = useEmoji();
 
+	const handleTitleChange = (e: TextAreaEvent, pageId: string) => {
+		const newTitle = e.target.value;
+		pageTitle(pageId, newTitle);
+	};
+
+	const handleDescriptionChange = (e: TextAreaEvent, pageId: string) => {
+		const newDescription = e.target.value;
+		pageDescription(pageId, newDescription);
+	};
+
+	const handleContentChange = (e: TextAreaEvent, pageId: string) => {
+		const newContent = e.target.value;
+		pageContent(pageId, newContent);
+	};
+
+	const renderPage = (page: Page): JSX.Element => {
+		return (
+			<>
+				<React.Fragment>
+					<Show above="lg" ssr={false}>
+						<IconButton
+							aria-label="emoji"
+							size="lg"
+							variant="unstyled"
+							fontSize="45px"
+							icon={<span>{selectedEmoji2.emoji}</span>}
+							onClick={handleEmojiButton}
+							pos="absolute"
+						/>
+					</Show>
+					{showEmojiPicker && (
+						<EmojiPickerEl onEmojiClick={handleOpenEmoji2} top="10rem" />
+					)}
+
+					<VStack marginX={{ base: 0, lg: "65px" }}>
+						<Textarea
+							value={page.title}
+							placeholder="Untitled Page"
+							fontSize="4xl"
+							_focusVisible={{ outline: "none" }}
+							variant="unstyled"
+							fontWeight="bold"
+							resize="none"
+							onChange={(e) => handleTitleChange(e, page.id)}
+							rows={3}
+						/>
+						<Textarea
+							value={page.description}
+							placeholder="Page Description (Optional)"
+							_focusVisible={{ outline: "none" }}
+							color="gray.300"
+							variant="unstyled"
+							resize="none"
+							onChange={(e) => handleDescriptionChange(e, page.id)}
+						/>
+						<Textarea
+							placeholder="Enter your content here..."
+							_placeholder={{ color: "gray.300" }}
+							_focusVisible={{ outline: "none" }}
+							variant="unstyled"
+							onChange={(e) => handleContentChange(e, page.id)}
+							value={page.content}
+							resize="none"
+						/>
+						<Divider />
+					</VStack>
+					{page.child?.map((subPage) => renderPage(subPage))}
+				</React.Fragment>
+			</>
+		);
+	};
 	return (
 		<>
-			<Show above="lg" ssr={false}>
-				<IconButton
-					aria-label="emoji"
-					size="lg"
-					variant="unstyled"
-					fontSize="45px"
-					icon={<span>{selectedEmoji2.emoji}</span>}
-					onClick={handleEmojiButton}
-					pos="absolute"
-				/>
-			</Show>
-			{showEmojiPicker && (
-				<EmojiPickerEl onEmojiClick={handleOpenEmoji2} top="10rem" />
-			)}
-			<VStack marginX={{ base: 0, lg: "65px" }}>
-				<Textarea
-					value={title}
-					placeholder="Untitled Page"
-					fontSize="4xl"
-					_focusVisible={{ outline: "none" }}
-					variant="unstyled"
-					fontWeight="bold"
-					resize="none"
-					onChange={(e) => onTitleChange(e)}
-					isReadOnly={readOnly}
-					rows={3}
-				/>
-				<Textarea
-					value={description}
-					placeholder="Page Description (Optional)"
-					_focusVisible={{ outline: "none" }}
-					color="gray.300"
-					variant="unstyled"
-					resize="none"
-					onChange={handleDescription}
-					isReadOnly={readOnly}
-				/>
-				<Textarea
-					placeholder="Enter your content here..."
-					_placeholder={{ color: "gray.300" }}
-					_focusVisible={{ outline: "none" }}
-					variant="unstyled"
-					rows={rows as number}
-					onChange={handleText}
-					value={text}
-					ref={textRef}
-					resize="none"
-					isReadOnly={readOnly}
-				/>
-				<Divider />
-			</VStack>
+			{pages.map((page) => (
+				<React.Fragment key={page.id}>{renderPage(page)}</React.Fragment>
+			))}
 		</>
 	);
 }

@@ -1,46 +1,29 @@
 import { Button } from "@chakra-ui/react";
+import { Page } from "../App";
 import Item from "./Item";
-import { useState } from "react";
-
-interface PageItem {
-	id: string;
-	title: string;
-	child: PageItem[];
-	parent: { title: string; child: PageItem[] } | null;
-}
+import React from "react";
 
 interface Props {
-	title: string;
+	addPage: () => void;
+	addSubPage: (parentId: string) => void;
+	pages: Page[];
 }
 
-function Sidebar({ title }: Props) {
-	const initialPage = { id: "1", title, child: [], parent: null };
-	const [sideBarItems, setSideBarItems] = useState<PageItem[]>([]);
-
-	const addNewPage = () => {
-		const newPage: PageItem = {
-			id: `page-${sideBarItems.length + 1}`,
-			title: `New Page ${sideBarItems.length + 1}`,
-			child: [],
-			parent: null,
-		};
-
-		setSideBarItems((prevItems) => [...prevItems, newPage]);
-	};
-
+function Sidebar({ addPage, pages, addSubPage }: Props) {
 	return (
 		<>
-			<Item {...initialPage} />
-			{sideBarItems.map((item) => (
-				<Item
-					title={item.title}
-					id={item.id}
-					child={item.child}
-					parent={item.parent}
-					key={item.id}
-				/>
+			{pages.map((page) => (
+				<React.Fragment key={page.id}>
+					<Item
+						title={page.title}
+						id={page.id}
+						parent={page.parent}
+						child={page.child}
+						addSubPage={addSubPage}
+					/>
+				</React.Fragment>
 			))}
-			<Button w={"100%"} onClick={addNewPage}>
+			<Button w={"100%"} onClick={addPage}>
 				Add New Page
 			</Button>
 		</>

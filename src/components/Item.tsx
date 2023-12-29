@@ -8,37 +8,19 @@ import {
 	Text,
 	VStack,
 } from "@chakra-ui/react";
-import { useState } from "react";
 import { FaEllipsisVertical } from "react-icons/fa6";
 import "../assets/css/Item.css";
+import { Page } from "../App";
 
 interface Props {
 	id: string;
 	title: string;
-	child: Props[];
-	parent: { title: string; child: Props[] } | null;
+	child: Page[] | null;
+	parent: Page | null;
+	addSubPage: (parentId: string) => void;
 }
 
-function Item({ id, title, child }: Props) {
-	const [sideBarItems, setSideBarItems] = useState(child || []);
-	const generateUniqueId = (parentId: string | undefined, index: number) => {
-		if (parentId) {
-			return `${parentId}${String.fromCharCode(97 + index)}`;
-		}
-		return `${index + 1}`;
-	};
-
-	const addSubPage = () => {
-		const subPage = {
-			id: generateUniqueId(id, sideBarItems.length),
-			title: `Sub Page ${sideBarItems.length + 1}`,
-			child: [],
-			parent: { title, child } || null,
-		};
-
-		setSideBarItems([...sideBarItems, subPage]);
-	};
-
+function Item({ id, title, child, addSubPage }: Props) {
 	return (
 		<VStack spacing={3} align="stretch">
 			<Flex
@@ -61,7 +43,7 @@ function Item({ id, title, child }: Props) {
 						size="sm"
 					/>
 					<MenuList>
-						<MenuItem command="⌘N" onClick={addSubPage}>
+						<MenuItem command="⌘N" onClick={() => addSubPage(id)}>
 							Add Sub Page
 						</MenuItem>
 						<MenuItem command="⌘T">New Tab</MenuItem>
@@ -71,13 +53,14 @@ function Item({ id, title, child }: Props) {
 				</Menu>
 			</Flex>
 			<ul className="sidebar-list">
-				{sideBarItems.map((sidebarItem, index) => (
-					<li key={generateUniqueId(id, index)}>
+				{child?.map((item) => (
+					<li key={item.id}>
 						<Item
-							id={sidebarItem.id || generateUniqueId(id, index)}
-							title={sidebarItem.title}
-							child={sidebarItem.child}
-							parent={sidebarItem.parent || null}
+							id={item.id}
+							title={item.title}
+							child={item.child}
+							parent={item.parent}
+							addSubPage={addSubPage}
 						/>
 					</li>
 				))}

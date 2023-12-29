@@ -7,6 +7,15 @@ import Sidebar from "./components/Sidebar";
 import useHandler from "./hooks/useHandler";
 import APIClient from "./services/api-client";
 
+export interface Page {
+	id: string;
+	title: string;
+	description: string;
+	content: string;
+	parent: Page | null;
+	child: Page[] | null;
+}
+
 interface Credentials {
 	email: string;
 	password: string;
@@ -20,11 +29,12 @@ interface User extends Credentials {
 }
 
 function App() {
-	const { title, readOnly, onTitleChange, handleEditButton } = useHandler();
+	const { title, readOnly, handleEditButton } = useHandler();
 	const [loading, setLoading] = useState(false);
 	const [isLoggedIn, setLoggedIn] = useState(false);
 	const [email, setEmail] = useState("");
 	const [pass, setPass] = useState("");
+	const [pages, setPages] = useState<Page[]>([]);
 
 	const apiClient = new APIClient<User, Credentials>("/login");
 
@@ -38,6 +48,71 @@ function App() {
 		} catch (error) {
 			console.log(error);
 			setLoading(false);
+		}
+	};
+
+	const pageTitle = (pageId: string, title: string) => {
+		setPages((prevPages) =>
+			prevPages.map((page) => {
+				if (page.id === pageId) {
+					return { ...page, title };
+				}
+				return page;
+			}),
+		);
+	};
+
+	const pageDescription = (pageId: string, description: string) => {
+		setPages((prevPages) =>
+			prevPages.map((page) => {
+				if (page.id === pageId) {
+					return { ...page, description };
+				}
+				return page;
+			}),
+		);
+	};
+
+	const pageContent = (pageId: string, content: string) => {
+		setPages((prevPages) =>
+			prevPages.map((page) => {
+				if (page.id === pageId) {
+					return { ...page, content };
+				}
+				return page;
+			}),
+		);
+	};
+
+	const addPage = () => {
+		const newPage: Page = {
+			id: `page-${pages.length + 1}`,
+			title: `New Page ${pages.length + 1}`,
+			description: "",
+			content: "",
+			parent: null,
+			child: [],
+		};
+
+		setPages((prevPages) => [...prevPages, newPage]);
+	};
+
+	const addSubPage = (parentId: string) => {
+		const parentPage = pages.find((page) => page.id === parentId);
+
+		if (parentPage?.child) {
+			const newSubPage: Page = {
+				id: `sub-page-${parentPage.child?.length + 1}`,
+				title: `Sub Page ${parentPage.child?.length + 1}`,
+				description: "",
+				content: "",
+				parent: parentPage,
+				child: [],
+			};
+			const updatedPages = [...pages];
+			const updatedParent = updatedPages.find((page) => page.id === parentId);
+			updatedParent?.child?.push(newSubPage);
+			setPages(updatedPages);
 		}
 	};
 
@@ -81,14 +156,17 @@ function App() {
 				</GridItem>
 				<Show above="lg" ssr={false}>
 					<GridItem area="aside" padding={3}>
-						<Sidebar title={title} />
+						<Sidebar addPage={addPage} pages={pages} addSubPage={addSubPage} />
 					</GridItem>
 				</Show>
 				<GridItem area="main" px={4} w="80%">
 					<Editor
-						title={title}
-						onTitleChange={(e) => onTitleChange(e)}
-						readOnly={readOnly}
+						pageTitle={(pageId, title) => pageTitle(pageId, title)}
+						pageDescription={(pageId, description) =>
+							pageDescription(pageId, description)
+						}
+						pageContent={(pageId, content) => pageContent(pageId, content)}
+						pages={pages}
 					/>
 				</GridItem>
 			</Grid>
