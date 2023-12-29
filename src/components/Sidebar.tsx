@@ -5,21 +5,28 @@ import React from "react";
 
 interface Props {
 	addPage: () => void;
-	addSubPage: (parentId: string) => void;
+	addSubPage: (parentPage: Page) => void;
 	pages: Page[];
+	setActivePage: (page: Page) => void;
+	activePage: Page | null;
 }
 
-function Sidebar({ addPage, pages, addSubPage }: Props) {
+function Sidebar({
+	addPage,
+	pages,
+	addSubPage,
+	setActivePage,
+	activePage,
+}: Props) {
 	return (
 		<>
 			{pages.map((page) => (
 				<React.Fragment key={page.id}>
 					<Item
-						title={page.title}
-						id={page.id}
-						parent={page.parent}
-						child={page.child}
+						page={page}
 						addSubPage={addSubPage}
+						setActivePage={setActivePage}
+						activePage={activePage}
 					/>
 				</React.Fragment>
 			))}

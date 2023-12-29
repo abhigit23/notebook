@@ -24,7 +24,7 @@ function Form({ email, pass, handleSubmit, setEmail, setPass }: Props) {
 				value={pass}
 				onChange={(e) => setPass(e.target.value)}
 			/>
-			<Button mt={4} colorScheme="blue" type="submit">
+			<Button mt={4} colorScheme="blue" type="submit" w="100%">
 				Submit
 			</Button>
 		</form>

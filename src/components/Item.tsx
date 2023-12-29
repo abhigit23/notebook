@@ -13,14 +13,18 @@ import "../assets/css/Item.css";
 import { Page } from "../App";
 
 interface Props {
-	id: string;
-	title: string;
-	child: Page[] | null;
-	parent: Page | null;
-	addSubPage: (parentId: string) => void;
+	page: Page;
+	addSubPage: (parentPage: Page) => void;
+	setActivePage: (page: Page) => void;
+	activePage: Page | null;
 }
 
-function Item({ id, title, child, addSubPage }: Props) {
+function Item({ page, addSubPage, setActivePage, activePage }: Props) {
+	const handleClick = () => {
+		setActivePage(page);
+	};
+
+	const isActive = activePage?.id === page.id;
 	return (
 		<VStack spacing={3} align="stretch">
 			<Flex
@@ -30,9 +34,10 @@ function Item({ id, title, child, addSubPage }: Props) {
 				align="center"
 				paddingLeft={5}
 				paddingRight={1}
+				backgroundColor={isActive ? "gray" : "unset"}
 			>
-				<Text w="80%" paddingY={2}>
-					{title ? title : "Untitled Page"}
+				<Text w="80%" paddingY={2} onClick={handleClick} cursor="pointer">
+					{page.title ? page.title : "Untitled Page"}
 				</Text>
 				<Menu size="sm">
 					<MenuButton
@@ -43,7 +48,7 @@ function Item({ id, title, child, addSubPage }: Props) {
 						size="sm"
 					/>
 					<MenuList>
-						<MenuItem command="⌘N" onClick={() => addSubPage(id)}>
+						<MenuItem command="⌘N" onClick={() => addSubPage(page)}>
 							Add Sub Page
 						</MenuItem>
 						<MenuItem command="⌘T">New Tab</MenuItem>
@@ -53,14 +58,13 @@ function Item({ id, title, child, addSubPage }: Props) {
 				</Menu>
 			</Flex>
 			<ul className="sidebar-list">
-				{child?.map((item) => (
+				{page.child?.map((item) => (
 					<li key={item.id}>
 						<Item
-							id={item.id}
-							title={item.title}
-							child={item.child}
-							parent={item.parent}
+							page={item}
 							addSubPage={addSubPage}
+							setActivePage={setActivePage}
+							activePage={activePage}
 						/>
 					</li>
 				))}

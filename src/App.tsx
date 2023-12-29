@@ -8,12 +8,13 @@ import useHandler from "./hooks/useHandler";
 import APIClient from "./services/api-client";
 
 export interface Page {
-	id: string;
+	id: number;
 	title: string;
 	description: string;
 	content: string;
-	parent: Page | null;
+	parentId: number | null;
 	child: Page[] | null;
+	emoji: string;
 }
 
 interface Credentials {
@@ -29,12 +30,13 @@ interface User extends Credentials {
 }
 
 function App() {
-	const { title, readOnly, handleEditButton } = useHandler();
+	const { readOnly, handleEditButton } = useHandler();
 	const [loading, setLoading] = useState(false);
 	const [isLoggedIn, setLoggedIn] = useState(false);
 	const [email, setEmail] = useState("");
 	const [pass, setPass] = useState("");
 	const [pages, setPages] = useState<Page[]>([]);
+	const [activePage, setActivePage] = useState<Page | null>(null);
 
 	const apiClient = new APIClient<User, Credentials>("/login");
 
@@ -51,7 +53,7 @@ function App() {
 		}
 	};
 
-	const pageTitle = (pageId: string, title: string) => {
+	const pageTitle = (pageId: number, title: string) => {
 		setPages((prevPages) =>
 			prevPages.map((page) => {
 				if (page.id === pageId) {
@@ -62,7 +64,7 @@ function App() {
 		);
 	};
 
-	const pageDescription = (pageId: string, description: string) => {
+	const pageDescription = (pageId: number, description: string) => {
 		setPages((prevPages) =>
 			prevPages.map((page) => {
 				if (page.id === pageId) {
@@ -73,7 +75,7 @@ function App() {
 		);
 	};
 
-	const pageContent = (pageId: string, content: string) => {
+	const pageContent = (pageId: number, content: string) => {
 		setPages((prevPages) =>
 			prevPages.map((page) => {
 				if (page.id === pageId) {
@@ -84,35 +86,47 @@ function App() {
 		);
 	};
 
+	const pageEmoji = (pageId: number, emoji: string) => {
+		setPages((prevPages) =>
+			prevPages.map((page) => {
+				if (page.id === pageId) {
+					return { ...page, emoji };
+				}
+				return page;
+			}),
+		);
+	};
+
 	const addPage = () => {
 		const newPage: Page = {
-			id: `page-${pages.length + 1}`,
+			id: Date.now(),
 			title: `New Page ${pages.length + 1}`,
 			description: "",
 			content: "",
-			parent: null,
+			parentId: null,
 			child: [],
+			emoji: "😀",
 		};
 
 		setPages((prevPages) => [...prevPages, newPage]);
+		setActivePage(newPage);
 	};
 
-	const addSubPage = (parentId: string) => {
-		const parentPage = pages.find((page) => page.id === parentId);
-
+	const addSubPage = (parentPage: Page) => {
 		if (parentPage?.child) {
 			const newSubPage: Page = {
-				id: `sub-page-${parentPage.child?.length + 1}`,
+				id: Date.now(),
 				title: `Sub Page ${parentPage.child?.length + 1}`,
 				description: "",
 				content: "",
-				parent: parentPage,
+				parentId: parentPage.id,
 				child: [],
+				emoji: "😄",
 			};
 			const updatedPages = [...pages];
-			const updatedParent = updatedPages.find((page) => page.id === parentId);
-			updatedParent?.child?.push(newSubPage);
+			parentPage?.child?.push(newSubPage);
 			setPages(updatedPages);
+			setActivePage(newSubPage);
 		}
 	};
 
@@ -148,25 +162,27 @@ function App() {
 				gap={{ base: "unset", lg: "0 150px" }}
 			>
 				<GridItem area="nav">
-					<Navbar
-						readOnly={readOnly}
-						handleEditButton={handleEditButton}
-						title={title}
-					/>
+					<Navbar readOnly={readOnly} handleEditButton={handleEditButton} />
 				</GridItem>
 				<Show above="lg" ssr={false}>
 					<GridItem area="aside" padding={3}>
-						<Sidebar addPage={addPage} pages={pages} addSubPage={addSubPage} />
+						<Sidebar
+							addPage={addPage}
+							pages={pages}
+							addSubPage={addSubPage}
+							setActivePage={setActivePage}
+							activePage={activePage}
+						/>
 					</GridItem>
 				</Show>
 				<GridItem area="main" px={4} w="80%">
 					<Editor
-						pageTitle={(pageId, title) => pageTitle(pageId, title)}
-						pageDescription={(pageId, description) =>
-							pageDescription(pageId, description)
-						}
-						pageContent={(pageId, content) => pageContent(pageId, content)}
+						pageTitle={pageTitle}
+						pageDescription={pageDescription}
+						pageContent={pageContent}
+						pageEmoji={pageEmoji}
 						pages={pages}
+						activePage={activePage}
 					/>
 				</GridItem>
 			</Grid>

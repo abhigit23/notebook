@@ -33,6 +33,7 @@ const useEmoji = () => {
 		handleEmojiButton,
 		handleOpenEmoji1,
 		handleOpenEmoji2,
+		setEmojiPicker,
 	};
 };
 

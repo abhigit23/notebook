@@ -32,15 +32,14 @@ import useEmoji from "../hooks/useEmoji";
 import useHeading from "../hooks/useHeading";
 import ColorModeSwitch from "./ColorModeSwitch";
 import EmojiPickerEl from "./EmojiPickerEl";
-import Item from "./Item";
+// import Item from "./Item";
 
 interface Props {
 	readOnly: boolean;
 	handleEditButton: () => void;
-	title: string;
 }
 
-function Navbar({ readOnly, handleEditButton, title }: Props) {
+function Navbar({ readOnly, handleEditButton }: Props) {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const { heading, handleHeadingInput } = useHeading(inputRef);
 	const {
@@ -86,9 +85,7 @@ function Navbar({ readOnly, handleEditButton, title }: Props) {
 							<DrawerCloseButton />
 							<DrawerHeader>Create your Notes 😀</DrawerHeader>
 
-							<DrawerBody>
-								<Item title={title} id="1" child={[]} parent={null} />
-							</DrawerBody>
+							<DrawerBody>{/* <Item /> */}</DrawerBody>
 
 							<DrawerFooter>
 								<Button variant="outline" mr={3} onClick={onClose}>
