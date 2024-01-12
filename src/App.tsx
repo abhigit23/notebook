@@ -13,8 +13,8 @@ export interface Page {
 	description: string;
 	content: string;
 	parentId: number | null;
-	child: Page[] | null;
 	emoji: string;
+	child: Page[] | null;
 }
 
 interface Credentials {
@@ -53,48 +53,44 @@ function App() {
 		}
 	};
 
+	const updateProperty = (
+		pages: Page[],
+		pageId: number,
+		property: "title" | "description" | "content" | "emoji",
+		value: string,
+	): Page[] => {
+		return pages.map((page) => {
+			if (page.id === pageId) {
+				return { ...page, [property]: value };
+			}
+			if (page.child && page.child.length > 0) {
+				return {
+					...page,
+					child: updateProperty(page.child, pageId, property, value),
+				};
+			}
+			return page;
+		});
+	};
+
 	const pageTitle = (pageId: number, title: string) => {
-		setPages((prevPages) =>
-			prevPages.map((page) => {
-				if (page.id === pageId) {
-					return { ...page, title };
-				}
-				return page;
-			}),
-		);
+		setPages((prevPages) => updateProperty(prevPages, pageId, "title", title));
 	};
 
 	const pageDescription = (pageId: number, description: string) => {
 		setPages((prevPages) =>
-			prevPages.map((page) => {
-				if (page.id === pageId) {
-					return { ...page, description };
-				}
-				return page;
-			}),
+			updateProperty(prevPages, pageId, "description", description),
 		);
 	};
 
 	const pageContent = (pageId: number, content: string) => {
 		setPages((prevPages) =>
-			prevPages.map((page) => {
-				if (page.id === pageId) {
-					return { ...page, content };
-				}
-				return page;
-			}),
+			updateProperty(prevPages, pageId, "content", content),
 		);
 	};
 
 	const pageEmoji = (pageId: number, emoji: string) => {
-		setPages((prevPages) =>
-			prevPages.map((page) => {
-				if (page.id === pageId) {
-					return { ...page, emoji };
-				}
-				return page;
-			}),
-		);
+		setPages((prevPages) => updateProperty(prevPages, pageId, "emoji", emoji));
 	};
 
 	const addPage = () => {
@@ -104,8 +100,8 @@ function App() {
 			description: "",
 			content: "",
 			parentId: null,
-			child: [],
 			emoji: "😀",
+			child: [],
 		};
 
 		setPages((prevPages) => [...prevPages, newPage]);
@@ -120,14 +116,30 @@ function App() {
 				description: "",
 				content: "",
 				parentId: parentPage.id,
-				child: [],
 				emoji: "😄",
+				child: [],
 			};
 			const updatedPages = [...pages];
 			parentPage?.child?.push(newSubPage);
 			setPages(updatedPages);
 			setActivePage(newSubPage);
 		}
+	};
+
+	const handleTitleChange = (pageId: number, newTitle: string) => {
+		pageTitle(pageId, newTitle);
+	};
+
+	const handleDescriptionChange = (pageId: number, newDescription: string) => {
+		pageDescription(pageId, newDescription);
+	};
+
+	const handleContentChange = (pageId: number, newContent: string) => {
+		pageContent(pageId, newContent);
+	};
+
+	const handleEmojiChange = (pageId: number, emojiString: string) => {
+		pageEmoji(pageId, emojiString);
 	};
 
 	return (
@@ -162,7 +174,15 @@ function App() {
 				gap={{ base: "unset", lg: "0 150px" }}
 			>
 				<GridItem area="nav">
-					<Navbar readOnly={readOnly} handleEditButton={handleEditButton} />
+					<Navbar
+						readOnly={readOnly}
+						handleEditButton={handleEditButton}
+						addPage={addPage}
+						pages={pages}
+						addSubPage={addSubPage}
+						setActivePage={setActivePage}
+						activePage={activePage}
+					/>
 				</GridItem>
 				<Show above="lg" ssr={false}>
 					<GridItem area="aside" padding={3}>
@@ -177,10 +197,10 @@ function App() {
 				</Show>
 				<GridItem area="main" px={4} w="80%">
 					<Editor
-						pageTitle={pageTitle}
-						pageDescription={pageDescription}
-						pageContent={pageContent}
-						pageEmoji={pageEmoji}
+						pageTitle={handleTitleChange}
+						pageDescription={handleDescriptionChange}
+						pageContent={handleContentChange}
+						pageEmoji={handleEmojiChange}
 						pages={pages}
 						activePage={activePage}
 					/>

@@ -21,25 +21,40 @@ import {
 	useDisclosure,
 } from "@chakra-ui/react";
 import { useRef } from "react";
+import React from "react";
 import {
 	FaBars,
-	FaFloppyDisk,
 	FaEllipsisVertical,
+	FaFloppyDisk,
 	FaPenToSquare,
 } from "react-icons/fa6";
 import { ImSphere } from "react-icons/im";
+import { Page } from "../App";
 import useEmoji from "../hooks/useEmoji";
 import useHeading from "../hooks/useHeading";
 import ColorModeSwitch from "./ColorModeSwitch";
 import EmojiPickerEl from "./EmojiPickerEl";
-// import Item from "./Item";
+import Item from "./Item";
 
 interface Props {
 	readOnly: boolean;
 	handleEditButton: () => void;
+	addPage: () => void;
+	addSubPage: (parentPage: Page) => void;
+	pages: Page[];
+	setActivePage: (page: Page) => void;
+	activePage: Page | null;
 }
 
-function Navbar({ readOnly, handleEditButton }: Props) {
+function Navbar({
+	readOnly,
+	handleEditButton,
+	addPage,
+	pages,
+	addSubPage,
+	setActivePage,
+	activePage,
+}: Props) {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const { heading, handleHeadingInput } = useHeading(inputRef);
 	const {
@@ -85,13 +100,26 @@ function Navbar({ readOnly, handleEditButton }: Props) {
 							<DrawerCloseButton />
 							<DrawerHeader>Create your Notes 😀</DrawerHeader>
 
-							<DrawerBody>{/* <Item /> */}</DrawerBody>
+							<DrawerBody>
+								{pages.map((page) => (
+									<React.Fragment key={page.id}>
+										<Item
+											page={page}
+											addSubPage={addSubPage}
+											setActivePage={setActivePage}
+											activePage={activePage}
+										/>
+									</React.Fragment>
+								))}
+							</DrawerBody>
 
 							<DrawerFooter>
 								<Button variant="outline" mr={3} onClick={onClose}>
 									Cancel
 								</Button>
-								<Button colorScheme="blue">Add New Page</Button>
+								<Button colorScheme="blue" onClick={addPage}>
+									Add New Page
+								</Button>
 							</DrawerFooter>
 						</DrawerContent>
 					</Drawer>
