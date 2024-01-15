@@ -195,7 +195,7 @@ function App() {
 						/>
 					</GridItem>
 				</Show>
-				<GridItem area="main" px={4} w="80%">
+				<GridItem area="main" px={4} w={{ base: "100%", lg: "80%" }}>
 					<Editor
 						pageTitle={handleTitleChange}
 						pageDescription={handleDescriptionChange}
